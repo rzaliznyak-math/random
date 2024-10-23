@@ -5,7 +5,7 @@ date: "2024-10-18"
 execute:
   echo: false
 format: 
-  gfm: 
+  html: 
     toc: true
     toc-depth: 2
 jupyter: python3
@@ -23,6 +23,7 @@ _But how much could that number vary each time we run this experiment?_
 
 # Simulating Data
 ```{python}
+#| code-fold: false
 #| echo: true
 
 from numpy.random import binomial
@@ -32,11 +33,62 @@ conversion_rate = 0.10
 number_of_visitors = int(1e3)
 
 
-number_simulated_experiments = int(1e6)
+number_simulated_experiments = int(1e5)
 control_simulated_results = binomial(
     number_of_visitors, conversion_rate, size=number_simulated_experiments
 )
 
 
-print(mean(control_simulated_results))
+```
+
+
+```{python}
+import plotly.subplots as sp
+import pandas as pd
+import plotly.express as px
+
+
+df = pd.DataFrame(control_simulated_results, columns=['value'])
+running_total_df = df.copy()
+
+# Count occurrences and create a running total
+running_total_df['count'] = running_total_df['value'].map(running_total_df['value'].value_counts())
+running_total_df['running_total'] = running_total_df.groupby('value').cumcount() + 1
+
+# Rearranging to match the running total of occurrences
+running_total_df = running_total_df[['value', 'count', 'running_total']]
+
+
+
+
+fig_1 = px.scatter(running_total_df[0:1], x="value", y="running_total")
+fig_2 = px.scatter(running_total_df[0:50], x="value", y="running_total")
+fig_3 = px.scatter(running_total_df[0:250], x="value", y="running_total")
+fig_4 = px.scatter(running_total_df[0:500], x="value", y="running_total")
+fig_5 = px.scatter(running_total_df[0:1000], x="value", y="running_total")
+fig_6 = px.scatter(running_total_df[0:10000], x="value", y="running_total")
+
+
+fig = sp.make_subplots(rows=2, cols=3, 
+                       subplot_titles=('Scatter Plot 1', 'Histogram 1', 'Box Plot 1',
+                                       'Scatter Plot 2', 'Histogram 2', 'Box Plot 2'))
+
+# Add figures to corresponding subplots
+fig.add_trace(fig_1.data[0], row=1, col=1)
+fig.add_trace(fig_2.data[0], row=1, col=2)
+fig.add_trace(fig_3.data[0], row=1, col=3)
+fig.add_trace(fig_4.data[0], row=2, col=1)
+fig.add_trace(fig_5.data[0], row=2, col=2)
+fig.add_trace(fig_6.data[0], row=2, col=3)
+
+x_ticks = [80, 100, 120]
+for i in range(1, 4):  # Columns
+    fig.update_xaxes(tickvals=x_ticks, row=1, col=i, title = int(running_total_df.iloc[0]["value"]) if i == 1 else None)
+    fig.update_xaxes(tickvals=x_ticks, row=2, col=i)
+
+# Update layout for title and spacing
+fig.update_layout( height=600)
+fig.show()
+
+
 ```
