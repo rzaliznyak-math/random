@@ -1,0 +1,19 @@
+---
+title: "Simulate Randomness of Web Conversion with Numpy"
+author: "Russ Zaliznyak"
+date: "2024-10-18"
+execute:
+  echo: false
+format: 
+  gfm: 
+    toc: true
+    toc-depth: 2
+jupyter: python3
+---
+
+# Website Conversions: 
+```{python}
+#| echo: true
+
+import numpy as np
+```
