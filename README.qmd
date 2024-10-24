@@ -6,6 +6,7 @@ execute:
   echo: false
 format: 
   html: 
+    css: style.css
     toc: true
     toc-depth: 2
 jupyter: python3
@@ -23,17 +24,21 @@ _But how much could that number vary each time we run this experiment?_
 
 # Simulating Data
 
+Website conversion follows the _binomial distribution_.
+$$
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
+$$
 
-The cumulative distribution function (CDF) is defined as:
-$$
-P(X \leq k) = \sum_{i=0}^{k} \binom{n}{i} p^i (1-p)^{n-i}
-$$
+Where n = 1000 (trials) and p = 0.10 (conversion rate).
+Below we simulate running and repeating this experiment 100,000.
+
 
 ```{python}
-#| code-fold: true
+#| code-fold: false
 #| echo: true
 
-from numpy.random import binomial
+from numpy.random import binomial, seed
+seed(20)
 
 conversion_rate = 0.10
 number_of_visitors = int(1e3)
@@ -48,11 +53,17 @@ control_simulated_results = binomial(
 ```
 
 
-## Results
+## Examining Results
+
+At the end of each simulation, we record and plot how many conversions took place. Each panel represents the results of plotting more simulations together.
+
+Are you seeing a pattern develop?
 
 ```{python}
 #| label: fig-scenario-one-plot
-#| fig-cap: A histogram of plausible treatment effects that could be responsible for our delta-to-control; with experiment DTC plotted.
+#| fig-cap: Histograms of the aforementioned simulated experiments. With enougn simulations, it's possible to see website conversion forms a predictable pattern.
+#| code-fold: true
+#| echo: true
 
 import plotly.subplots as sp
 import pandas as pd
@@ -60,68 +71,72 @@ import plotly.express as px
 from math import ceil
 
 
-df = pd.DataFrame(control_simulated_results, columns=['value'])
+df = pd.DataFrame(control_simulated_results, columns=["value"])
 running_total_df = df.copy()
 
 # Count occurrences and create a running total
-running_total_df['count'] = running_total_df['value'].map(running_total_df['value'].value_counts())
-running_total_df['running_total'] = running_total_df.groupby('value').cumcount() + 1
+running_total_df["count"] = running_total_df["value"].map(
+    running_total_df["value"].value_counts()
+)
+running_total_df["running_total"] = running_total_df.groupby("value").cumcount() + 1
 
 # Rearranging to match the running total of occurrences
-running_total_df = running_total_df[['value', 'count', 'running_total']]
+running_total_df = running_total_df[["value", "count", "running_total"]]
 
 
-
-
-number_experiments_list = [1,50,200,400,800,2500, 10000, number_simulated_experiments]
-subplot_titles =tuple([ f"n = {value}" for value in number_experiments_list])
+number_experiments_list = [
+    1,
+    50,
+    200,
+    400,
+    800,
+    2500,
+    10000,
+    number_simulated_experiments,
+]
+subplot_titles = tuple([f"# sims = {value}" for value in number_experiments_list])
 number_experiments_list_length = len(number_experiments_list)
 
 
 number_cols = 4
-number_rows = ceil(number_experiments_list_length/number_cols)
+number_rows = ceil(number_experiments_list_length / number_cols)
 
-fig = sp.make_subplots(rows=number_rows, cols=number_cols, 
-                       subplot_titles=subplot_titles, vertical_spacing=0.1)
+fig = sp.make_subplots(
+    rows=number_rows,
+    cols=number_cols,
+    subplot_titles=subplot_titles,
+    vertical_spacing=0.1,
+)
 
 for j in range(len(number_experiments_list)):
-  number = number_experiments_list[j]
-  fig_0 = px.scatter(running_total_df[0:number], x="value", y="running_total")
+    number = number_experiments_list[j]
+    fig_0 = px.scatter(running_total_df[0:number], x="value", y="running_total")
 
-  row = 1 + int(j/number_cols)
-  col = 1+ j - (row-1)*number_cols
-  fig.add_trace(fig_0.data[0], row=row, col=col)
-
-
+    row = 1 + int(j / number_cols)
+    col = 1 + j - (row - 1) * number_cols
+    fig.add_trace(fig_0.data[0], row=row, col=col)
 
 
-"""
-# Add figures to corresponding subplots
-fig.add_trace(fig_1.data[0], row=1, col=1)
-fig.add_trace(fig_2.data[0], row=1, col=2)
-fig.add_trace(fig_3.data[0], row=1, col=3)
-fig.add_trace(fig_4.data[0], row=2, col=1)
-fig.add_trace(fig_5.data[0], row=2, col=2)
-fig.add_trace(fig_6.data[0], row=2, col=3)
-
-x_ticks = [80, 100, 120]
-for i in range(1, 4):  # Columns
-    fig.update_xaxes(tickvals=x_ticks, row=1, col=i, title = int(running_total_df.iloc[0]["value"]) if i == 1 else None)
-    fig.update_xaxes(tickvals=x_ticks, row=2, col=i)
-
-# Update layout for title and spacing
-fig.update_layout( height=600)
-fig.show()
-"""
-
-fig.update_layout( height=600)
+fig.update_layout(height=600)
 x_ticks = [80, 100, 120]
 for j in range(len(number_experiments_list)):
-  row = 1 + int(j/number_cols)
-  col = 1+ j - (row-1)*number_cols
+    row = 1 + int(j / number_cols)
+    col = 1 + j - (row - 1) * number_cols
 
-  fig.update_xaxes(tickvals=x_ticks if j > 0 else [int(df["value"].iloc[0])], row=row, col=col)
+    fig.update_xaxes(
+        tickvals=x_ticks if j > 0 else [int(df["value"].iloc[0])], row=row, col=col
+    )
 
 fig.show()
 
 ```
+
+<!--
+The cumulative distribution function (CDF) is defined as:
+$$
+P(X \leq k) = \sum_{i=0}^{k} \binom{n}{i} p^i (1-p)^{n-i}
+$$
+-->
+
+
+## Use Simulation Results to Estimate Randomness 
