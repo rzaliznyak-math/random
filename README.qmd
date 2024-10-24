@@ -24,13 +24,15 @@ _But how much could that number vary each time we run this experiment?_
 
 # Simulating Data
 
+<!--
 Website conversion follows the _binomial distribution_.
 $$
 P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
 $$
 
 Where n = 1000 (trials) and p = 0.10 (conversion rate).
-Below we simulate running and repeating this experiment 100,000x.
+-->
+Let's simulate the process of website conversion 100,000x with n = 1,000 and p = 0.10 (conversion rate).
 
 
 ```{python}
@@ -314,6 +316,7 @@ final_figure.update_layout(
         x=0.02,
     ),
 )
+final_figure.update_layout(height=300)
 final_figure.show()
 
 
