@@ -22,12 +22,18 @@ $$
 _But how much could that number vary each time we run this experiment?_
 
 # Simulating Data
+
+
+The cumulative distribution function (CDF) is defined as:
+$$
+P(X \leq k) = \sum_{i=0}^{k} \binom{n}{i} p^i (1-p)^{n-i}
+$$
+
 ```{python}
 #| code-fold: true
 #| echo: true
 
 from numpy.random import binomial
-from numpy import mean
 
 conversion_rate = 0.10
 number_of_visitors = int(1e3)
@@ -42,7 +48,12 @@ control_simulated_results = binomial(
 ```
 
 
+## Results
+
 ```{python}
+#| label: fig-scenario-one-plot
+#| fig-cap: A histogram of plausible treatment effects that could be responsible for our delta-to-control; with experiment DTC plotted.
+
 import plotly.subplots as sp
 import pandas as pd
 import plotly.express as px
@@ -62,16 +73,16 @@ running_total_df = running_total_df[['value', 'count', 'running_total']]
 
 
 
-number_experiments_list = [1,50,250,500,1000,10000, 20000]
+number_experiments_list = [1,50,200,400,800,2500, 10000, number_simulated_experiments]
 subplot_titles =tuple([ f"n = {value}" for value in number_experiments_list])
 number_experiments_list_length = len(number_experiments_list)
 
 
-number_cols = 3
+number_cols = 4
 number_rows = ceil(number_experiments_list_length/number_cols)
 
 fig = sp.make_subplots(rows=number_rows, cols=number_cols, 
-                       subplot_titles=subplot_titles)
+                       subplot_titles=subplot_titles, vertical_spacing=0.1)
 
 for j in range(len(number_experiments_list)):
   number = number_experiments_list[j]
