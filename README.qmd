@@ -30,7 +30,7 @@ P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
 $$
 
 Where n = 1000 (trials) and p = 0.10 (conversion rate).
-Below we simulate running and repeating this experiment 100,000.
+Below we simulate running and repeating this experiment 100,000x.
 
 
 ```{python}
@@ -57,7 +57,7 @@ control_simulated_results = binomial(
 
 At the end of each simulation, we record and plot how many conversions took place. Each panel represents the results of plotting more simulations together.
 
-Are you seeing a pattern develop?
+Our first experiment only generated 82 conversions. But with enough simulated experiments plotted together, are you seeing a pattern develop?
 
 ```{python}
 #| label: fig-scenario-one-plot
@@ -69,6 +69,7 @@ import plotly.subplots as sp
 import pandas as pd
 import plotly.express as px
 from math import ceil
+from numpy import where
 
 
 df = pd.DataFrame(control_simulated_results, columns=["value"])
@@ -82,6 +83,7 @@ running_total_df["running_total"] = running_total_df.groupby("value").cumcount()
 
 # Rearranging to match the running total of occurrences
 running_total_df = running_total_df[["value", "count", "running_total"]]
+
 
 
 number_experiments_list = [
@@ -110,7 +112,11 @@ fig = sp.make_subplots(
 
 for j in range(len(number_experiments_list)):
     number = number_experiments_list[j]
-    fig_0 = px.scatter(running_total_df[0:number], x="value", y="running_total")
+    fig_0 = px.scatter(
+        running_total_df[0:number],
+        x="value",
+        y="running_total",
+    )
 
     row = 1 + int(j / number_cols)
     col = 1 + j - (row - 1) * number_cols
@@ -140,3 +146,7 @@ $$
 
 
 ## Use Simulation Results to Estimate Randomness 
+
+- What's the chance of 82 conversions or fewer?
+- What's the chance of 110 conversion or more?
+- What's the chance of between 90 and 110 conversions?

@@ -2,6 +2,7 @@ import plotly.subplots as sp
 import pandas as pd
 import plotly.express as px
 from math import ceil
+from numpy import where
 
 
 df = pd.DataFrame(control_simulated_results, columns=["value"])
@@ -15,6 +16,7 @@ running_total_df["running_total"] = running_total_df.groupby("value").cumcount()
 
 # Rearranging to match the running total of occurrences
 running_total_df = running_total_df[["value", "count", "running_total"]]
+running_total_df["new_column"] = where(running_total_df["value"] > 110, "blue", "red")
 
 
 number_experiments_list = [
@@ -27,7 +29,7 @@ number_experiments_list = [
     10000,
     number_simulated_experiments,
 ]
-subplot_titles = tuple([f"n = {value}" for value in number_experiments_list])
+subplot_titles = tuple([f"# sims = {value}" for value in number_experiments_list])
 number_experiments_list_length = len(number_experiments_list)
 
 
@@ -43,7 +45,13 @@ fig = sp.make_subplots(
 
 for j in range(len(number_experiments_list)):
     number = number_experiments_list[j]
-    fig_0 = px.scatter(running_total_df[0:number], x="value", y="running_total")
+    fig_0 = px.scatter(
+        running_total_df[0:number],
+        x="value",
+        y="running_total",
+        color="new_column",
+        color_discrete_sequence=["red", "blue"],
+    )
 
     row = 1 + int(j / number_cols)
     col = 1 + j - (row - 1) * number_cols
