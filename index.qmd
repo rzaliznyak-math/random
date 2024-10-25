@@ -61,11 +61,11 @@ print(f"simulation runtime: {round(stop-start,3)} secs")
 
 At the end of each simulation, we record and plot how many conversions took place. Each panel represents the results of plotting more simulations together.
 
-Our first experiment only generated 82 conversions. But with enough simulated experiments plotted together, are you seeing a pattern develop?
+Our first experiment only generated 82 conversions. But with enough simulations plotted together, are you seeing a pattern develop?
 
 ```{python}
 #| label: fig-one-plot
-#| fig-cap: Histograms of the aforementioned simulated experiments. With enougn simulations, it's possible to see website conversion forms a predictable pattern.
+#| fig-cap: Histograms of the aforementioned simulations. With enougn simulations, it's possible to see website conversion forms a predictable pattern.
 #| code-fold: true
 #| echo: true
 
@@ -106,7 +106,7 @@ number_experiments_list_length = len(number_experiments_list)
 
 number_cols = 4
 number_rows = ceil(number_experiments_list_length / number_cols)
-BLUE = "#0177c9"
+BLUE = "#82b2e0"
 RED = "#bd0707"
 fig = sp.make_subplots(
     rows=number_rows,
@@ -153,9 +153,9 @@ $$
 
 ## Use Simulation Results to Estimate Randomness 
 
-1. What's the chance of 82 conversions or fewer?
-2. What's the chance of 110 conversions or more?
-3. What's the chance of between 90 and 110 conversions?
+1. What's the chance of 85 conversions or fewer?
+2. What's the chance of 115 conversions or more?
+3. What's the chance of between 85 and 115 conversions?
 
 
 ```{python}
@@ -190,12 +190,12 @@ text_list = [
 distribution_figure = sp.make_subplots(
     rows=1,
     cols=3,
-    subplot_titles=("82 conversions or less", "110 conversions or more", "Between 90 and 110 conversions"),
+    subplot_titles=("85 conversions or less", "115 conversions or more", "Between 85 and 115 conversions"),
     vertical_spacing=0.1,
 )
 
-lower_bound_list = [82, None, 90]
-upper_bound_list = [None, 110, 110]
+lower_bound_list = [85, None, 85]
+upper_bound_list = [None, 115, 115]
 
 
 line_color_left = BLUE
@@ -296,14 +296,11 @@ for j in range(3):
     
 
 
-# for i in range(3):
-#  distribution_figure.update_yaxes(title_text=i, row=1, col=i+1, showticklabels=False)
-
 
 tick_values = [
-    percentile(control_simulated_results, 5),
-    percentile(control_simulated_results, 50),
-    percentile(control_simulated_results, 95),
+    85,
+    100,
+    115
 ]
 
 distribution_figure.update_xaxes(
@@ -326,9 +323,9 @@ distribution_figure.update_traces(hoverlabel=dict(font=dict(size=18)))
 distribution_figure.update_layout(height=300)
 distribution_figure.update_layout(
     annotations=[
-        dict(text="82 conversions or less", x=0.15, y=1.05, font=dict(size=12), showarrow=False),
-        dict(text="110 conversions or more", x=0.5, y=1.05, font=dict(size=12), showarrow=False),
-        dict(text="Between 90 and 110 conversions", x=0.85, y=1.05, font=dict(size=12), showarrow=False),
+        dict(text="85 conversions or less", x=0.15, y=1.05, font=dict(size=12), showarrow=False),
+        dict(text="115 conversions or more", x=0.5, y=1.05, font=dict(size=12), showarrow=False),
+        dict(text="Between 85 and 115 conversions", x=0.85, y=1.05, font=dict(size=12), showarrow=False),
     ]
 )
 
