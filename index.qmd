@@ -14,9 +14,9 @@ jupyter: python3
 
 
 ## Introduction
-Imagine your website converts 10% of its visitors to paying customers. Over the course of 1,000 visitors, how many converts should we expect? A quick back of the envelope calculation shows we should expect 100 conversions:
+Imagine your website converts 10% of its visitors to paying customers. Over the course of 10,000 visitors, how many converts should we expect? A quick back of the envelope calculation shows we should expect 1,000 conversions:
 $$
-1000 \, \text{visitors} * \frac{10 \, \text{conversions}}{100 \, \text{visitors}} = 100 \, \text{conversions}
+10000 \, \text{visitors} * \frac{10 \, \text{conversions}}{100 \, \text{visitors}} = 1000 \, \text{conversions}
 $$
 
 
@@ -32,7 +32,7 @@ $$
 
 Where n = 1000 (trials) and p = 0.10 (conversion rate).
 -->
-Let's simulate the process of website conversion 1,000,000x with n = 1,000 and p = 0.10 (conversion rate).
+Let's simulate the process of website conversion 1,000,000x with n = 10,000 and p = 0.10 (conversion rate).
 
 
 ```{python}
@@ -40,10 +40,12 @@ Let's simulate the process of website conversion 1,000,000x with n = 1,000 and p
 #| echo: true
 import timeit
 from numpy.random import binomial, seed
-seed(20)
+seed(10)
 
 conversion_rate = 0.10
-number_of_visitors = int(1e3)
+number_of_visitors = int(1e4)
+standard_error = (conversion_rate*(1-conversion_rate)/number_of_visitors)**0.5
+
 
 start = timeit.default_timer()
 number_simulated_experiments = int(1e6)
@@ -61,7 +63,7 @@ print(f"simulation runtime: {round(stop-start,3)} secs")
 
 At the end of each simulation, we record and plot how many conversions took place. Each panel represents the results of plotting more simulations together.
 
-Our first experiment only generated 82 conversions. But with enough simulations plotted together, are you seeing a pattern develop?
+Our first simulation only generated `{python} control_simulated_results[0]` conversions. But with enough simulations plotted together, are you seeing a pattern develop?
 
 ```{python}
 #| label: fig-one-plot
@@ -130,7 +132,7 @@ for j in range(len(number_experiments_list)):
 
 
 fig.update_layout(height=600)
-x_ticks = [80, 100, 120]
+x_ticks = [950, 1000, 1050]
 for j in range(len(number_experiments_list)):
     row = 1 + int(j / number_cols)
     col = 1 + j - (row - 1) * number_cols
@@ -153,9 +155,9 @@ $$
 
 ## Use Simulation Results to Estimate Randomness 
 
-1. What's the chance of 85 conversions or fewer?
-2. What's the chance of 115 conversions or more?
-3. What's the chance of between 85 and 115 conversions?
+1. What's the chance of 950 conversions or fewer?
+2. What's the chance of 1050 conversions or more?
+3. What's the chance of between 950 and 1050 conversions (exclusive)?
 
 
 ```{python}
@@ -186,21 +188,25 @@ text_list = [
     f"Pr( {hover_string} > { round((100 if is_rate else 1)*X[j],3 if is_rate else 2) }{'%' if is_rate else ''}) = {'{0:.2%}'.format(1 - cdf_list[j])}"
     for j in range(len(X))
 ]
-
+distribution_titles = (
+        "950 conversions or less",
+        "1050 conversions or more",
+        "Between 950 and 1050 conversions",
+    )
 distribution_figure = sp.make_subplots(
     rows=1,
     cols=3,
-    subplot_titles=("85 conversions or less", "115 conversions or more", "Between 85 and 115 conversions"),
+    subplot_titles=distribution_titles,
     vertical_spacing=0.1,
 )
 
-lower_bound_list = [85, None, 85]
-upper_bound_list = [None, 115, 115]
+lower_bound_list = [950, None, 950]
+upper_bound_list = [None, 1050, 1050]
 
 
 line_color_left = BLUE
 line_color_right = BLUE
-all_graph_elements_extra = []
+probability_list = []
 for j in range(3):
     lower_bound_position = 0
     upper_bound_position = number_points - 1
@@ -212,15 +218,44 @@ for j in range(3):
     if upper_bound is not None:
         upper_bound_position = where(array(X) > upper_bound)[0][0]
 
+    prob = None
+    probability = None
     if lower_bound is not None and upper_bound is not None:
         line_color_left = BLUE
-    elif lower_bound is not None:
-        line_color_left = RED
-
-    if lower_bound is not None and upper_bound is not None:
         line_color_right = BLUE
-    elif upper_bound is not None:
+        prob = mean(
+            where(
+                (control_simulated_results > lower_bound)
+                & (control_simulated_results < upper_bound),
+                1,
+                0,
+            )
+        )
+        x_axis_title = f"{prob:.2%} of outcomes shaded"
+        probability = stats.norm.cdf(
+            upper_bound / number_of_visitors, loc=conversion_rate, scale=standard_error
+        ) - stats.norm.cdf(
+            lower_bound / number_of_visitors, loc=conversion_rate, scale=standard_error
+        )
+    elif lower_bound is not None and upper_bound is None:
+        line_color_left = RED
+        prob = mean(where(control_simulated_results <= lower_bound, 1, 0))
+        x_axis_title = f"{prob:.2%} of outcomes shaded"
+
+        probability = stats.norm.cdf(
+            lower_bound / number_of_visitors, loc=conversion_rate, scale=standard_error
+        )
+    elif upper_bound is not None and lower_bound is None:
         line_color_right = RED
+        prob = mean(where(control_simulated_results >= upper_bound, 1, 0))
+        x_axis_title = f"{prob:.2%} of outcomes shaded"
+        probability = 1 - stats.norm.cdf(
+            upper_bound / number_of_visitors, loc=conversion_rate, scale=standard_error
+        )
+    else:
+        pass
+    probability_list.append(probability)
+    x_axis_title = f"{prob:.2%} of outcomes shaded" if prob is not None else None
 
     line_color_middle = RED if line_color_left == BLUE else BLUE
     distribution_figure.add_trace(
@@ -293,22 +328,22 @@ for j in range(3):
         row=1,
         col=j + 1,
     )
-    
+
+    distribution_figure.update_xaxes(
+        title_text=x_axis_title,
+        row=1,
+        col=j + 1,
+    )
 
 
-
-tick_values = [
-    85,
-    100,
-    115
-]
+tick_values = [950, 1000, 1050]
 
 distribution_figure.update_xaxes(
     zeroline=False,
     tickangle=0,
     # title = "" if x_axis_title is None else x_axis_title,
     tickvals=tick_values,
-    title_font=dict(size=15),
+    title_font=dict(size=12),
     ticks="inside",  # Default is 'outside'
     ticklen=6,
 )
@@ -323,13 +358,62 @@ distribution_figure.update_traces(hoverlabel=dict(font=dict(size=18)))
 distribution_figure.update_layout(height=300)
 distribution_figure.update_layout(
     annotations=[
-        dict(text="85 conversions or less", x=0.15, y=1.05, font=dict(size=12), showarrow=False),
-        dict(text="115 conversions or more", x=0.5, y=1.05, font=dict(size=12), showarrow=False),
-        dict(text="Between 85 and 115 conversions", x=0.85, y=1.05, font=dict(size=12), showarrow=False),
+        dict(
+            text="950 conversions or less",
+            x=0.15,
+            y=1.05,
+            font=dict(size=12),
+            showarrow=False,
+        ),
+        dict(
+            text="1050 conversions or more",
+            x=0.5,
+            y=1.05,
+            font=dict(size=12),
+            showarrow=False,
+        ),
+        dict(
+            text="Between 950 and 1050 conversions",
+            x=0.85,
+            y=1.05,
+            font=dict(size=12),
+            showarrow=False,
+        ),
     ]
 )
 
+
 distribution_figure.show()
 
+```
+
+## Verify Results
+
+Rate-based metrics are normally distributed; so we use the normal approximation to confirm our results with mean `{python} conversion_rate` and standard_error = `{python} standard_error`.
+
+
+$$
+F(0.095) = \Phi\left( \frac{0.095 - 0.10}{0.003} \right) = \Phi\left( -1.67 \right) = 0.0478
+$$
+
+
+```{python}
+# | code-fold: true
+# | echo: false
+import pandas as pd
+
+probability_list = [f"{value:.2%}" for value in probability_list]
+df = pd.DataFrame({"Type":distribution_titles, "Probability": probability_list})
+print(df)
 
 ```
+
+Differences are explained by the continuous nature of the normal approximation. Our data is discrete.
+
+
+## Conclusion
+
+This simple example shows numpy.random can be used to simulate data. You can use it to build intuition for AB testing and other analysis.
+
+Upcoming papers will show how to extend numpy.random to model sequential testing, Bayesian testing, and other complex processes.
+Simulation studies help us understand our problems when closed-form analytical solutions may not be readily available.
