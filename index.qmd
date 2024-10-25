@@ -1,7 +1,7 @@
 ---
 title: "Understanding Randomess & Chance with Numpy"
 author: "Russ Zaliznyak"
-date: "2024-10-24"
+date: "2024-10-18"
 execute:
   echo: false
 format: 
