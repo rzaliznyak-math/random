@@ -1,7 +1,7 @@
 ---
-title: "Understanding Randomess & Chance with Numpy"
+title: "Use Numpy Random Generator to Model Randomness"
 author: "Russ Zaliznyak"
-date: "2024-10-24"
+date: "2024-10-29"
 execute:
   echo: false
 format: 
@@ -14,6 +14,13 @@ jupyter: python3
 
 
 ## Introduction
+
+Simulating data is an indispensable tool in the business and data science community. It offers a cost-effective way to model complex relationships and rare events within datasets, enabling the exploration of various scenarios without real-world consequences.
+
+Simulations can facilitate the measurement of competing methods' performance on shared datasets and assess how statistical models perform when the ground truth is known. This helps to refine analytical methodologies and even support training of machine learning models in the absence of real data.
+
+## Website Conversion Example
+
 Imagine your website converts 10% of its visitors to paying customers. Over the course of 10,000 visitors, how many converts should we expect? A quick back of the envelope calculation shows we should expect 1,000 conversions:
 $$
 10000 \, \text{visitors} * \frac{10 \, \text{conversions}}{100 \, \text{visitors}} = 1000 \, \text{conversions}
@@ -44,7 +51,6 @@ seed(10)
 
 conversion_rate = 0.10
 number_of_visitors = int(1e4)
-standard_error = (conversion_rate*(1-conversion_rate)/number_of_visitors)**0.5
 
 
 start = timeit.default_timer()
@@ -57,7 +63,6 @@ print(f"simulation runtime: {round(stop-start,3)} secs")
 
 
 ```
-
 
 ## Examining Results
 
@@ -168,7 +173,7 @@ $$
 import plotly.graph_objects as go
 from scipy import stats
 
-
+standard_error = (conversion_rate*(1-conversion_rate)/number_of_visitors)**0.5
 BLUE = "#0177c9"
 RED = "#bd0707"
 number_points = 250
@@ -387,7 +392,7 @@ distribution_figure.show()
 
 ```
 
-## Verify Results
+## Verify Simulation Results
 
 Rate-based metrics are normally distributed; so we use the normal approximation to confirm our results with mean `{python} conversion_rate` and standard_error = `{python} standard_error`.
 
@@ -413,7 +418,8 @@ Differences are explained by the continuous nature of the normal approximation. 
 
 ## Conclusion
 
-This simple example shows numpy.random can be used to simulate data. You can use it to build intuition for AB testing and other analysis.
+Simulation studies will help us understand our problems when closed-form analytical solutions may not be readily available.
+This simple example shows numpy.random can be used to simulate and understand the randomness of website conversion data.
 
-Upcoming papers will show how to extend numpy.random to model sequential testing, Bayesian testing, and other complex processes.
-Simulation studies help us understand our problems when closed-form analytical solutions may not be readily available.
+In upcoming papers, we will extend these simulations to further our understanding of AB Testing concepts. Later we will model more complex processes like: Sequential & Bayesian Testing and the benefits of CUPED.
+
