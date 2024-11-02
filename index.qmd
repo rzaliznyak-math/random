@@ -1,7 +1,7 @@
 ---
 title: "The Power of Data Simulation"
 subtitle: "Using Numpy Random Generator to Model Randomness"
-author: "Russ Zaliznyak"
+author: "Russ Zaliznyak <[rzaliznyak@gmail.com](mailto:rzaliznyak@gmail.com)>"
 date: "2024-11-05"
 execute:
   echo: false
@@ -9,7 +9,8 @@ format:
   html: 
     css: style.css
     toc: true
-    toc-depth: 2
+    toc-expand: true
+    toc-indent: 1em
 jupyter: python3
 ---
 
@@ -55,8 +56,7 @@ print(f"simulation runtime: {round(stop-start,3)} secs")
 
 
 ```
-
-## Examining Results
+## Analyze Simulation Results
 
 At the end of each simulation, we record and plot how many conversions took place. Each panel represents the results of plotting more simulations together.
 
@@ -122,13 +122,13 @@ for j in range(len(number_experiments_list)):
         y="running_total",
         color_discrete_sequence = [BLUE]
     )
+    
 
     row = 1 + int(j / number_cols)
     col = 1 + j - (row - 1) * number_cols
     fig.add_trace(fig_0.data[0], row=row, col=col)
 
 
-fig.update_layout(height=600)
 x_ticks = [950, 1000, 1050]
 for j in range(len(number_experiments_list)):
     row = 1 + int(j / number_cols)
@@ -138,6 +138,7 @@ for j in range(len(number_experiments_list)):
         tickvals=x_ticks if j > 0 else [int(df["value"].iloc[0])], row=row, col=col
     )
 
+fig.update_layout(height=600, hovermode=False)
 fig.show()
 
 ```
@@ -403,8 +404,7 @@ print(f"{prob:.2%}")
 
 ## Verify Simulation Results
 
-Rate-based metrics are normally distributed; so can we use the normal approximation to verify our results with mean `{python} conversion_rate` and standard_error = `{python} standard_error`.
-
+Rate-based metrics are normally distributed; so we use the normal approximation to verify our simulation results are reasonable using with mean `{python} conversion_rate` and standard_error = `{python} f"({conversion_rate}"` * `{python} f"{1 - conversion_rate})/sqrt(10,000)"`.
 
 $$
 F(0.095) = \Phi\left( \frac{0.095 - 0.10}{0.003} \right) = \Phi\left( -1.67 \right) = 0.0478
@@ -425,7 +425,7 @@ print(df)
 Slight differences are explained by the continuous nature of the normal approximation. Our data is discrete.
 
 
-## Conclusion
+# Conclusion
 
 Our simple example demonstrates how numpy.random can be used to simulate and understand the randomness of website conversion.
 Simulation studies become even more important when our problems don't readily have closed-form analytical solutions available. 
