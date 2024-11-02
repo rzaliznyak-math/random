@@ -1,7 +1,8 @@
 ---
-title: "Use Numpy Random Generator to Model Randomness"
+title: "The Power of Data Simulation"
+subtitle: "Using Numpy Random Generator to Model Randomness"
 author: "Russ Zaliznyak"
-date: "2024-10-29"
+date: "2024-11-05"
 execute:
   echo: false
 format: 
@@ -19,7 +20,7 @@ Simulating data is an indispensable tool in the business and data science commun
 
 Simulations can facilitate the measurement of competing methods' performance on shared datasets and assess how statistical models perform when the ground truth is known. This helps to refine analytical methodologies and even support training of machine learning models in the absence of real data.
 
-## Website Conversion Example
+## Simple Website Conversion Example
 
 Imagine your website converts 10% of its visitors to paying customers. Over the course of 10,000 visitors, how many converts should we expect? A quick back of the envelope calculation shows we should expect 1,000 conversions:
 $$
@@ -27,18 +28,9 @@ $$
 $$
 
 
-_But how much could that number vary each time we run this experiment?_
+_How much could that number vary on any given day?_
 
 # Simulating Data
-
-<!--
-Website conversion follows the _binomial distribution_.
-$$
-P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}
-$$
-
-Where n = 1000 (trials) and p = 0.10 (conversion rate).
--->
 Let's simulate the process of website conversion 1,000,000x with n = 10,000 and p = 0.10 (conversion rate).
 
 
@@ -68,7 +60,7 @@ print(f"simulation runtime: {round(stop-start,3)} secs")
 
 At the end of each simulation, we record and plot how many conversions took place. Each panel represents the results of plotting more simulations together.
 
-Our first simulation only generated `{python} control_simulated_results[0]` conversions. But with enough simulations plotted together, are you seeing a pattern develop?
+Our first simulation generated only `{python} control_simulated_results[0]` conversions. But with enough simulations plotted together, are you seeing a pattern develop?
 
 ```{python}
 #| label: fig-one-plot
@@ -392,9 +384,26 @@ distribution_figure.show()
 
 ```
 
+
+See below how EASY it is to calculate these probabilities!!!
+
+```{python}
+#| code-fold: false
+#| echo: true
+prob = mean(
+    where(
+        (control_simulated_results > 950)
+        & (control_simulated_results < 1050),
+        1,
+        0,
+    )
+)
+print(f"{prob:.2%}")
+```
+
 ## Verify Simulation Results
 
-Rate-based metrics are normally distributed; so we use the normal approximation to confirm our results with mean `{python} conversion_rate` and standard_error = `{python} standard_error`.
+Rate-based metrics are normally distributed; so can we use the normal approximation to verify our results with mean `{python} conversion_rate` and standard_error = `{python} standard_error`.
 
 
 $$
@@ -413,13 +422,13 @@ print(df)
 
 ```
 
-Differences are explained by the continuous nature of the normal approximation. Our data is discrete.
+Slight differences are explained by the continuous nature of the normal approximation. Our data is discrete.
 
 
 ## Conclusion
 
-Simulation studies will help us understand our problems when closed-form analytical solutions may not be readily available.
-This simple example shows numpy.random can be used to simulate and understand the randomness of website conversion data.
+Our simple example demonstrates how numpy.random can be used to simulate and understand the randomness of website conversion.
+Simulation studies become even more important when our problems don't readily have closed-form analytical solutions available. 
 
-In upcoming papers, we will extend these simulations to further our understanding of AB Testing concepts. Later we will model more complex processes like: Sequential & Bayesian Testing and the benefits of CUPED.
+In upcoming papers, we will extend these simulations to further our understanding of AB Testing concepts like Sequential and Bayesian Testing.
 
