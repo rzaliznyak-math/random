@@ -1,8 +1,8 @@
 ---
 title: "The Power of Data Simulation"
-subtitle: "Using Numpy Random Generator to Model Randomness & Build Intuition"
+subtitle: "Using Python's NumPy Random Generator to Model Randomness & Build Intuition"
 author: "Russ Zaliznyak <[rzaliznyak@gmail.com](mailto:rzaliznyak@gmail.com)>"
-date: "2024-11-05"
+date: "2024-11-04"
 execute:
   echo: false
 format: 
@@ -21,7 +21,9 @@ Simulating data is an indispensable tool in the business and data science commun
 
 Simulations can facilitate the measurement of competing methods' performance on shared datasets and assess how statistical models perform when the ground truth is known. This helps to refine analytical methodologies and even support training of machine learning models in the absence of real data.
 
-# Simple Website Conversion Example
+Using website conversion as our example, we are going to simulate huge datasets and build our intuition for the randomness we might expect to see. By the end of this paper, you'll be able to model randomness and analyze results for rate-based metrics on your own.
+
+# Website Conversion Example
 
 Imagine your website converts 10% of its visitors to paying customers. Over the course of 10,000 visitors, how many converts should we expect? A quick back of the envelope calculation shows we should expect 1,000 conversions:
 $$
@@ -386,7 +388,7 @@ distribution_figure.show()
 ```
 
 
-See below how EASY it is to calculate these probabilities!!!
+Once you've simulated your dataset, it is _**effortless**_ to calculate these probabilities!!!
 
 ```{python}
 #| code-fold: false
@@ -404,7 +406,7 @@ print(f"{prob:.2%}")
 
 ## Verify Simulation Results
 
-Rate-based metrics are normally distributed; so we use the normal approximation to verify our simulation results are reasonable using mean = `{python} conversion_rate` and standard_error = `{python} f"({conversion_rate}"` * `{python} f"{1 - conversion_rate})/sqrt(10,000)"`.
+Because Rate-based metrics are normally distributed, we can use the normal approximation to verify our simulation results are reasonable using mean = `{python} conversion_rate` and standard_error = `{python} f"({conversion_rate}"` * `{python} f"{1 - conversion_rate})/sqrt(10,000)"`.
 
 $$
 F(0.095) = \Phi\left( \frac{0.095 - 0.10}{0.003} \right) = \Phi\left( -1.67 \right) = 0.0478
@@ -427,8 +429,13 @@ Slight differences are explained by the continuous nature of the normal approxim
 
 # Conclusion
 
-Our simple example demonstrates how numpy.random can be used to simulate and understand the randomness of website conversion.
-Simulation studies become even more important when our problems don't readily have closed-form analytical solutions available. 
+By simulating 1MM simulations for our website conversion example, we were able to observe patterns and trends that might be difficult or costly to capture in real-world scenarios. For now, you should have learned how to use NumPy to generate rate-based simulated data and how to interpret the results.
 
-In upcoming papers, we will extend these simulations to further our understanding of AB Testing concepts like Sequential and Bayesian Testing.
+This approach will prove even more valuable when dealing with problems that lack closed-form analytical solutions. 
+We will demonstrate this utility in future topics when we expand our use of NumPy to model more complex AB Testing topics like:
 
+- Continuous Metrics
+- Statistical Power
+- Sequential & Bayesian Testing
+- Using Prior Information to Improve Effect Size Estimates
+- CUPED: Using Covariates to Reduce Experimentation Run-time
