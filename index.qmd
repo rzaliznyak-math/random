@@ -439,3 +439,7 @@ We will demonstrate this utility in future topics when we expand our use of NumP
 - Sequential & Bayesian Testing
 - Using Prior Information to Improve Effect Size Estimates
 - CUPED: Using Covariates to Reduce Experimentation Run-time
+
+# Acknowledgements
+
+Big THANK YOU to my colleague Joseph Powers, PhD, who introduced me to _Quarto_ and using simulation studies to make my work life easier.
