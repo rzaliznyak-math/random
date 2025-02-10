@@ -434,7 +434,7 @@ By simulating 1MM simulations for our website conversion example, we were able t
 This approach will prove even more valuable when dealing with problems that lack closed-form analytical solutions. 
 We will demonstrate this utility in future topics when we expand our use of NumPy to model more complex AB Testing topics like:
 
-- [**Experiment Design & Analysis with NumPy Random**: Understanding P-values and Statistical Power with NumPy Simulations](https://rzaliznyak-math.github.io/numpy-random-examples/){target="_blank"}.
+- [**Experiment Design & Analysis with NumPy Random**: Understanding P-values and Statistical Power with NumPy Simulations](https://rzaliznyak-math.github.io/numpy-random-p-value-power/){target="_blank"}.
 - Continuous Metrics
 - Sequential & Bayesian Testing
 - Using Prior Information to Improve Effect Size Estimates
